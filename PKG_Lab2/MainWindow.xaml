@@ -1,0 +1,26 @@
+﻿<Window x:Class="PKG_Lab2.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:PKG_Lab2"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800">
+    <Grid>
+        <Button Content="Выбрать папку" HorizontalAlignment="Left" VerticalAlignment="Top" Click="SelectFolder_Click"/>
+        <DataGrid x:Name="MetadataGrid" AutoGenerateColumns="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0,40,0,0">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Имя файла" Binding="{Binding FileName}"/>
+                <DataGridTextColumn Header="Размер (пиксели)" Binding="{Binding Dimensions}"/>
+                <DataGridTextColumn Header="Разрешение (dpi)" Binding="{Binding Resolution}"/>
+                <DataGridTextColumn Header="Глубина цвета" Binding="{Binding ColorDepth}"/>
+                <DataGridTextColumn Header="Сжатие" Binding="{Binding Compression}"/>
+                <DataGridTextColumn Header="Цветов в палитре" Binding="{Binding ColorCount}"/>
+                <DataGridTextColumn Header="Размер файла" Binding="{Binding Size}"/>
+                <DataGridTextColumn Header="Дата создания" Binding="{Binding Date}"/>
+            </DataGrid.Columns>
+        </DataGrid>
+    </Grid>
+</Window>
+    
+    
