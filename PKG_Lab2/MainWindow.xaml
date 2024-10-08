@@ -8,16 +8,17 @@
         Title="MainWindow" Height="450" Width="800">
     <Grid>
         <Button Content="Выбрать папку" HorizontalAlignment="Left" VerticalAlignment="Top" Click="SelectFolder_Click"/>
+        <Button Content="Выбрать изображение" HorizontalAlignment="Left" VerticalAlignment="Top" Click="SelectFolder_Click1" Margin="0,20,0,0"/>
         <DataGrid x:Name="MetadataGrid" AutoGenerateColumns="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0,40,0,0">
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Имя файла" Binding="{Binding FileName}"/>
-                <DataGridTextColumn Header="Размер (пиксели)" Binding="{Binding Dimensions}"/>
-                <DataGridTextColumn Header="Разрешение (dpi)" Binding="{Binding Resolution}"/>
-                <DataGridTextColumn Header="Глубина цвета" Binding="{Binding ColorDepth}"/>
-                <DataGridTextColumn Header="Сжатие" Binding="{Binding Compression}"/>
-                <DataGridTextColumn Header="Цветов в палитре" Binding="{Binding ColorCount}"/>
-                <DataGridTextColumn Header="Размер файла" Binding="{Binding Size}"/>
-                <DataGridTextColumn Header="Дата создания" Binding="{Binding Date}"/>
+                <DataGridTextColumn Header="Имя файла" Binding="{Binding FileName}" IsReadOnly="True"/>
+                <DataGridTextColumn Header="Размер (пиксели)" Binding="{Binding Dimensions}" IsReadOnly="True"/>
+                <DataGridTextColumn Header="Разрешение (dpi)" Binding="{Binding Resolution}" IsReadOnly="True"/>
+                <DataGridTextColumn Header="Глубина цвета" Binding="{Binding ColorDepth}" IsReadOnly="True"/>
+                <DataGridTextColumn Header="Сжатие" Binding="{Binding Compression}" IsReadOnly="True"/>
+                <DataGridTextColumn Header="Цветов в палитре" Binding="{Binding ColorCount}" IsReadOnly="True"/>
+                <DataGridTextColumn Header="Размер файла" Binding="{Binding Size}" IsReadOnly="True"/>
+                <DataGridTextColumn Header="Дата создания" Binding="{Binding Date}" IsReadOnly="True"/>
             </DataGrid.Columns>
         </DataGrid>
     </Grid>

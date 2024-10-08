@@ -70,6 +70,36 @@ namespace PKG_Lab2
             MetadataGrid.ItemsSource = metadataList;
         }
 
+        private void SelectFolder_Click1(object sender, RoutedEventArgs e)
+        {
+            var metadataList = new List<ImageMetadata>();
+
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.Filter = "Image Files|*.jpg;*.jpeg;*.png;*.bmp;*.gif";
+            if (openFileDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                string filePath = openFileDialog.FileName;
+                FileInfo fileInfo = new FileInfo(filePath);
+
+                var metadata = new ImageMetadata
+                {
+                    FileName = Path.GetFileName(filePath),
+                    Dimensions = GetImageResolution(filePath),
+                    Resolution = GetImageDpi(filePath),
+                    ColorDepth = GetImageColorDepth(filePath),
+                    Compression = GetCompressionRatio(filePath),
+                    ColorCount = GetUniqueColorCount(filePath),
+                    Size = GetFileSize(filePath),
+                    Date = GetFileCreationDate(filePath)
+                };
+
+                metadataList.Add(metadata);
+            }
+
+            MetadataGrid.ItemsSource = metadataList;
+
+        }
+
 
         public string GetImageResolution(string imagePath)
         {
