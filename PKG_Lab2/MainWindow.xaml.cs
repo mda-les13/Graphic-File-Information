@@ -16,6 +16,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Media.Media3D;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.Collections.Concurrent;
 
 namespace PKG_Lab2
 {
@@ -28,46 +29,51 @@ namespace PKG_Lab2
             this.MinHeight = 450;
         }
 
-        private void SelectFolder_Click(object sender, RoutedEventArgs e)
+        private async void SelectFolder_Click(object sender, RoutedEventArgs e)
         {
-            var metadataList = new List<ImageMetadata>();
+            var metadataList = new ConcurrentBag<ImageMetadata>();
             var dialog = new System.Windows.Forms.FolderBrowserDialog();
 
             if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
                 var folderPath = dialog.SelectedPath;
                 var imageFiles = System.IO.Directory.GetFiles(folderPath, "*.*", SearchOption.AllDirectories)
-                                          .Where(s => s.EndsWith(".jpg", StringComparison.OrdinalIgnoreCase) ||
-                                                      s.EndsWith(".jpeg", StringComparison.OrdinalIgnoreCase) ||
-                                                      s.EndsWith(".png", StringComparison.OrdinalIgnoreCase) ||
-                                                      s.EndsWith(".bmp", StringComparison.OrdinalIgnoreCase) ||
-                                                      s.EndsWith(".tif", StringComparison.OrdinalIgnoreCase) ||
-                                                      s.EndsWith(".pcx", StringComparison.OrdinalIgnoreCase) ||
-                                                      s.EndsWith(".gif", StringComparison.OrdinalIgnoreCase));
+                    .Where(s => s.EndsWith(".jpg", StringComparison.OrdinalIgnoreCase) ||
+                                s.EndsWith(".jpeg", StringComparison.OrdinalIgnoreCase) ||
+                                s.EndsWith(".png", StringComparison.OrdinalIgnoreCase) ||
+                                s.EndsWith(".bmp", StringComparison.OrdinalIgnoreCase) ||
+                                s.EndsWith(".tif", StringComparison.OrdinalIgnoreCase) ||
+                                s.EndsWith(".pcx", StringComparison.OrdinalIgnoreCase) ||
+                                s.EndsWith(".gif", StringComparison.OrdinalIgnoreCase))
+                    .ToList();
 
-                foreach (var filePath in imageFiles)
+                var tasks = new List<Task>();
+
+                Parallel.ForEach(imageFiles, filePath =>
                 {
-                    var directories = ImageMetadataReader.ReadMetadata(filePath);
-                    var metadata = new ImageMetadata
+                    tasks.Add(Task.Run(() =>
                     {
-                        FileName = Path.GetFileName(filePath),
-                        Dimensions = GetImageResolution(filePath),
-                        Resolution = GetImageDpi(filePath),
-                        ColorDepth = GetImageColorDepth(filePath),
-                        Compression = GetCompressionRatio(filePath),
-                        ColorCount = GetUniqueColorCount(filePath),
-                        Size = GetFileSize(filePath),
-                        Date = GetFileCreationDate(filePath)
-                    };
+                        var bitmap = new BitmapImage(new Uri(filePath));
+                        var metadata = new ImageMetadata
+                        {
+                            FileName = Path.GetFileName(filePath),
+                            Dimensions = $"{bitmap.PixelWidth} x {bitmap.PixelHeight}",
+                            Resolution = $"{bitmap.DpiX} x {bitmap.DpiY}",
+                            ColorDepth = $"{bitmap.Format.BitsPerPixel}",
+                            Compression = GetCompressionRatio(filePath),
+                            ColorCount = GetUniqueColorCount(filePath),
+                            Size = GetFileSize(filePath),
+                            Date = GetFileCreationDate(filePath)
+                        };
 
-                    if (metadata != null)
-                    {
                         metadataList.Add(metadata);
-                    }
-                }
+                    }));
+                });
+
+                await Task.WhenAll(tasks);
             }
 
-            MetadataGrid.ItemsSource = metadataList;
+            MetadataGrid.ItemsSource = metadataList.ToList();
         }
 
         private void SelectFolder_Click1(object sender, RoutedEventArgs e)
@@ -173,44 +179,6 @@ namespace PKG_Lab2
                 }
             }
             return null;
-        }
-
-        //нет возможности для вывода матрицы в таблицу, поэтому не используется
-        public static int[,] GetQuantizationMatrix(BitmapSource bitmapSource)
-        {
-            // Преобразование BitmapSource в Bitmap
-            Bitmap bitmap = BitmapFromSource(bitmapSource);
-
-            // Получение данных изображения
-            BitmapData bitmapData = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.ReadOnly, PixelFormat.Format24bppRgb);
-
-            // Пример матрицы квантования (8x8)
-            int[,] quantizationMatrix = new int[8, 8];
-
-            // Заполнение матрицы квантования (пример)
-            for (int i = 0; i < 8; i++)
-            {
-                for (int j = 0; j < 8; j++)
-                {
-                    quantizationMatrix[i, j] = (i + 1) * (j + 1);
-                }
-            }
-
-            bitmap.UnlockBits(bitmapData);
-            return quantizationMatrix;
-        }
-
-        private static Bitmap BitmapFromSource(BitmapSource bitmapsource)
-        {
-            Bitmap bitmap;
-            using (MemoryStream outStream = new MemoryStream())
-            {
-                BitmapEncoder enc = new BmpBitmapEncoder();
-                enc.Frames.Add(BitmapFrame.Create(bitmapsource));
-                enc.Save(outStream);
-                bitmap = new Bitmap(outStream);
-            }
-            return bitmap;
         }
 
         public static string GetUniqueColorCount(string imagePath)
